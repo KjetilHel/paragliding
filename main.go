@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/marni/goigc"
-	"google.golang.org/appengine"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -58,6 +56,8 @@ func init() {
 }
 
 func main() {
+
+
 	// The service handles three different patterns:
 	// /igcinfo/api
 	// /igcinfo/api/igc
@@ -65,10 +65,10 @@ func main() {
 	http.HandleFunc("/paragliding/api", infoHandler)
 	http.HandleFunc("/paragliding/", igcHandler)
 
-	appengine.Main() // Required for the service to work on GoogleCloud
+	//appengine.Main() // Required for the service to work on GoogleCloud
 
 	// Connects the service to a port and listens to that port
-	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -77,7 +77,7 @@ func main() {
 
 // Writes info about the service to the screen
 func infoHandler(w http.ResponseWriter, r *http.Request) {
-	api := APIInfo{uptime().String(), "Service for IGC tracks.", "v1"}
+	api := APIInfo{uptime().String(), "Service for paragliding tracks.", "v1"}
 	err := json.NewEncoder(w).Encode(api)
 	if err != nil {
 		panic(err)
