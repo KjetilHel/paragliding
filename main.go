@@ -126,7 +126,33 @@ func igcHandler(w http.ResponseWriter, r *http.Request) {
 		} else if len(url) == 5 {
 			switch url[3] {
 			case "track":
-				getTrack()
+				id, err := strconv.Atoi(url[4])
+				if err != nil {
+					panic(err)
+				}
+				if id < 0 {
+					fmt.Fprintln(w, "Id can not be a negative number")
+				} else if id < len(results) {
+					var i IgcInfo
+					// Finds the matching url and the correct data
+					data, err := igc.ParseLocation(igcs[id])
+					if err != nil {
+						panic(err)
+					}
+					// Puts the data into an struct and showing it to the user
+					i.HDate = data.Date.String()
+					i.Pilot = data.Pilot
+					i.Glider = data.GliderType
+					i.GiderID = data.GliderID
+					i.TrackLength = distOfTrack(data.Points)
+					i.TrackSrcUrl = igcs[id]
+					err = json.NewEncoder(w).Encode(i)
+					if err != nil {
+						panic(err)
+					}
+				} else {
+					fmt.Fprintln(w, "Id was too big")
+				}
 			case "ticker":
 			default:
 				fmt.Fprintln(w, "Not a valid field")
@@ -135,95 +161,61 @@ func igcHandler(w http.ResponseWriter, r *http.Request) {
 		} else if len(url) == 6 {
 			switch url[3] {
 			case "track":
-				getTrackField()
+				url := strings.Split(r.URL.Path, "/")
+				id, err := strconv.Atoi(url[4])
+				if err != nil {
+					panic(err)
+				}
+				if id < 0 {
+					fmt.Fprintln(w, "Id can not be a negative number")
+				} else if id < len(results) {
+					data, err := igc.ParseLocation(igcs[id])
+					if err != nil {
+						panic(err)
+					}
+					field := url[5] // Switch based on the field the user wants
+					switch field {
+					case "pilot":
+						err = json.NewEncoder(w).Encode(data.Pilot)
+						if err != nil {
+							panic(err)
+						}
+					case "glider":
+						err = json.NewEncoder(w).Encode(data.GliderType)
+						if err != nil {
+							panic(err)
+						}
+					case "glider_id":
+						err = json.NewEncoder(w).Encode(data.GliderID)
+						if err != nil {
+							panic(err)
+						}
+					case "track_length":
+						err = json.NewEncoder(w).Encode(distOfTrack(data.Points))
+						if err != nil {
+							panic(err)
+						}
+					case "H_date":
+						err = json.NewEncoder(w).Encode(data.Date.String())
+						if err != nil {
+							panic(err)
+						}
+					case "track_src_url":
+						err = json.NewEncoder(w).Encode(igcs[id])
+						if err != nil {
+							panic(err)
+						}
+					default:
+						fmt.Fprintln(w, "Not a valid field")
+					}
+				} else {
+					fmt.Fprintln(w, "Id was too big")
+				}
 			case "ticker":
 			default:
 				fmt.Fprintln(w, "Not a valid field")
 			}
 		}
-	}
-}
-
-func getTrack() {
-	id, err := strconv.Atoi(url[4])
-	if err != nil {
-		panic(err)
-	}
-	if id < 0 {
-		fmt.Fprintln(w, "Id can not be a negative number")
-	} else if id < len(results) {
-		var i IgcInfo
-		// Finds the matching url and the correct data
-		data, err := igc.ParseLocation(igcs[id])
-		if err != nil {
-			panic(err)
-		}
-		// Puts the data into an struct and showing it to the user
-		i.HDate = data.Date.String()
-		i.Pilot = data.Pilot
-		i.Glider = data.GliderType
-		i.GiderID = data.GliderID
-		i.TrackLength = distOfTrack(data.Points)
-		i.TrackUrlSrc = igcs[id]
-		err = json.NewEncoder(w).Encode(i)
-		if err != nil {
-			panic(err)
-		}
-	} else {
-		fmt.Fprintln(w, "Id was too big")
-	}
-}
-
-func getTrackField() {
-	url := strings.Split(r.URL.Path, "/")
-	id, err := strconv.Atoi(url[4])
-	if err != nil {
-		panic(err)
-	}
-	if id < 0 {
-		fmt.Fprintln(w, "Id can not be a negative number")
-	} else if id < len(results) {
-		data, err := igc.ParseLocation(igcs[id])
-		if err != nil {
-			panic(err)
-		}
-		field := url[5] // Switch based on the field the user wants
-		switch field {
-		case "pilot":
-			err = json.NewEncoder(w).Encode(data.Pilot)
-			if err != nil {
-				panic(err)
-			}
-		case "glider":
-			err = json.NewEncoder(w).Encode(data.GliderType)
-			if err != nil {
-				panic(err)
-			}
-		case "glider_id":
-			err = json.NewEncoder(w).Encode(data.GliderID)
-			if err != nil {
-				panic(err)
-			}
-		case "track_length":
-			err = json.NewEncoder(w).Encode(distOfTrack(data.Points))
-			if err != nil {
-				panic(err)
-			}
-		case "H_date":
-			err = json.NewEncoder(w).Encode(data.Date.String())
-			if err != nil {
-				panic(err)
-			}
-		case "track_src_url":
-			err = json.NewEncoder(w).Encode(igcs[id])
-			if err != nil {
-				panic(err)
-			}
-		default:
-			fmt.Fprintln(w, "Not a valid field")
-		}
-	} else {
-		fmt.Fprintln(w, "Id was too big")
 	}
 }
 
