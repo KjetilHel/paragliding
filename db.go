@@ -7,6 +7,7 @@ import (
 
 var db *mongo.Database
 
+// Connect is a function to stablish a connection to he mongodb server
 func Connect() (bool, error) {
 	connection, err := mongo.NewClient("mongodb://kjetilh:test123@ds145463.mlab.com:45463/paraglidig")
 
@@ -19,7 +20,7 @@ func Connect() (bool, error) {
 	return true, err
 }
 
-
+// addTrack is a function to add igc tracks to the db
 func addTrack(track IgcInfo) interface{} {
 	collection := db.Collection("tracks")
 

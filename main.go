@@ -34,7 +34,7 @@ type IgcInfo struct {
 	Glider      string  `json:"glider"`
 	GiderID     string  `json:"glider_id"`
 	TrackLength float64 `json:"track_length"`
-	TrackSrcUrl string 	`json:"track_src_url"`
+	TrackSrcURL string  `json:"track_src_url"`
 }
 
 // APIInfo is the struct for the api-information
@@ -129,7 +129,7 @@ func igcHandler(w http.ResponseWriter, r *http.Request) {
 			i.Glider = data.GliderType
 			i.GiderID = data.GliderID
 			i.TrackLength = distOfTrack(data.Points)
-			i.TrackSrcUrl = p.URL
+			i.TrackSrcURL = p.URL
 			addTrack(i)
 
 			// Increments the counter
@@ -164,7 +164,7 @@ func igcHandler(w http.ResponseWriter, r *http.Request) {
 					i.Glider = data.GliderType
 					i.GiderID = data.GliderID
 					i.TrackLength = distOfTrack(data.Points)
-					i.TrackSrcUrl = igcs[id]
+					i.TrackSrcURL = igcs[id]
 					err = json.NewEncoder(w).Encode(i)
 					if err != nil {
 						panic(err)
