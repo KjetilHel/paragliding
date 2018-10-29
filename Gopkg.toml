@@ -32,3 +32,8 @@
 [[constraint]]
   name = "github.com/mongodb/mongo-go-driver"
   version = "0.0.17"
+
+[metadata.heroku]
+  root-package = "github.com/kjetilhel/paragliding"
+  go-version = "1.11"
+  install = [ "./..." ]
