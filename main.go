@@ -57,7 +57,11 @@ func init() {
 
 func main() {
 
+	db, err := Connect()
 
+	if db != true {
+		panic("GODAMN THAT DB")
+	}
 	// The service handles three different patterns:
 	// /igcinfo/api
 	// /igcinfo/api/igc
@@ -68,7 +72,7 @@ func main() {
 	//appengine.Main() // Required for the service to work on GoogleCloud
 
 	// Connects the service to a port and listens to that port
-	err := http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -112,6 +116,21 @@ func igcHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				panic(err)
 			}
+
+			var i IgcInfo
+			// Finds the matching url and the correct data
+			data, err := igc.ParseLocation(p.URL)
+			if err != nil {
+				panic(err)
+			}
+			// Puts the data into an struct and showing it to the user
+			i.HDate = data.Date.String()
+			i.Pilot = data.Pilot
+			i.Glider = data.GliderType
+			i.GiderID = data.GliderID
+			i.TrackLength = distOfTrack(data.Points)
+			i.TrackSrcUrl = p.URL
+			addTrack(i)
 
 			// Increments the counter
 			idCount++
